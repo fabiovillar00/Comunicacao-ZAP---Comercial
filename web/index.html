@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Painel local do Robô DMB para gestão dos envios comerciais pelo WhatsApp.">
+  <title>Robô DMB — Central de envios</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .heading-actions { display: flex; gap: 10px; }
+    .button.execute { background: var(--green); color: #fff; }
+    .button.execute:hover { background: #116b49; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand-mark">DMB</div>
+      <div>
+        <p class="eyebrow">INFORMAÇÕES COMERCIAIS</p>
+        <h1>Central de envios</h1>
+      </div>
+      <div class="top-status"><span class="pulse"></span> Rotina ativa</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">ROBÔ DMB · WHATSAPP</p>
+          <h2>O fechamento diário,<br><span>sob controle.</span></h2>
+          <p class="hero-copy">Acompanhe o que será consultado, quem recebe a informação e o histórico de cada disparo.</p>
+        </div>
+        <div class="schedule-card">
+          <span>PRÓXIMO ENVIO</span>
+          <strong id="scheduleTime">18:00</strong>
+          <p>Diariamente · horário de Brasília</p>
+          <div class="live-row"><span class="status-dot"></span><b>Produção</b><small>Meta Cloud API</small></div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Resumo da rotina">
+        <article><span>Destinatários ativos</span><strong id="activeCount">—</strong><small>recebem às 18h</small></article>
+        <article><span>Template</span><strong class="metric-word">Aprovado</strong><small>utilidade · pt-BR</small></article>
+        <article><span>Último envio</span><strong class="metric-word" id="lastStatus">—</strong><small id="lastTime">sem registros</small></article>
+      </section>
+
+      <nav class="tabs" aria-label="Seções do painel">
+        <button class="tab active" data-tab="routine">Rotina e mensagem</button>
+        <button class="tab" data-tab="recipients">Destinatários</button>
+        <button class="tab" data-tab="history">Histórico</button>
+      </nav>
+
+      <section id="routine" class="panel tab-panel active">
+        <div class="panel-heading">
+          <div><p class="eyebrow">CONFIGURAÇÃO</p><h3>Consulta e conteúdo</h3></div>
+          <div class="heading-actions">
+            <button id="previewButton" class="button secondary">Testar consulta</button>
+            <button id="runNowButton" class="button execute">Executar agora</button>
+          </div>
+        </div>
+        <label for="query">Consulta SQL configurada</label>
+        <textarea id="query" class="code-field" spellcheck="false"></textarea>
+        <p class="hint">Somente consultas de leitura são aceitas. Alterações passam a valer no próximo envio.</p>
+        <label for="message">Texto exibido na mensagem</label>
+        <textarea id="message" class="message-field"></textarea>
+        <div class="actions"><button id="saveSettings" class="button primary">Salvar alterações</button></div>
+        <div id="previewBox" class="preview-box hidden"><span>PRÉVIA COM DADOS DO ERP</span><pre id="previewText"></pre></div>
+      </section>
+
+      <section id="recipients" class="panel tab-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">DISTRIBUIÇÃO</p><h3>Quem recebe</h3></div>
+          <button id="openRecipient" class="button primary">Adicionar pessoa</button>
+        </div>
+        <div id="recipientList" class="recipient-list"></div>
+      </section>
+
+      <section id="history" class="panel tab-panel">
+        <div class="panel-heading"><div><p class="eyebrow">AUDITORIA</p><h3>Últimos envios</h3></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Data e hora</th><th>Destinatário</th><th>Telefone</th><th>Status</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="recipientDialog">
+    <form id="recipientForm">
+      <div class="dialog-heading"><div><p class="eyebrow">NOVO DESTINATÁRIO</p><h3>Adicionar pessoa</h3></div><button type="button" id="closeDialog" aria-label="Fechar">×</button></div>
+      <label for="recipientName">Nome</label><input id="recipientName" name="name" maxlength="80" required placeholder="Ex.: Diretoria Comercial">
+      <label for="recipientPhone">WhatsApp com DDD</label><input id="recipientPhone" name="phone" required placeholder="(16) 99999-9999" inputmode="tel">
+      <p class="hint">O número será salvo no formato internacional +55.</p>
+      <div class="actions"><button type="button" id="cancelDialog" class="button secondary">Cancelar</button><button type="submit" class="button primary">Adicionar</button></div>
+    </form>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

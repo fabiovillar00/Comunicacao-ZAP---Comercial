@@ -1,0 +1,22 @@
+{
+  "dry_run": true,
+  "schedule": {
+    "time": "18:00",
+    "task_name": "DMB - Faturamento WhatsApp"
+  },
+  "database": {
+    "connection_string": "DRIVER={ODBC Driver 17 for SQL Server};SERVER=SEU_SERVIDOR;DATABASE=SUA_BASE;Trusted_Connection=yes;Encrypt=no;TrustServerCertificate=yes;APP=InformacoesComerciaisViaZap;ApplicationIntent=ReadOnly",
+    "query": "SELECT CONVERT(char(10), GETDATE(), 103) AS data_referencia, TOTALDIA.totaldia, CANCELADA_DIA.cancelada_dia FROM (SELECT SUM(OV.VALORLIQUIDO) AS totaldia FROM CM_ORDENSVENDA OV INNER JOIN CM_OPERACOESFATURAMENTO OFAT ON OFAT.HANDLE = OV.OPERACAOFATURAMENTO WHERE OV.DATAINCLUSAO >= CAST(GETDATE() AS date) AND OV.DATAINCLUSAO < DATEADD(DAY, 1, CAST(GETDATE() AS date)) AND OV.STATUS <> 5 AND OV.USUARIOINCLUIU <> 24 AND OV.OPERACAOFATURAMENTO NOT IN (58, 63, 113, 145) AND OV.PESSOA <> 16866 AND OFAT.K_TIPONATUREZAOPER IN (1, 5)) AS TOTALDIA CROSS JOIN (SELECT SUM((B.QUANTIDADE - B.QUANTIDADEFATURADA) * (B.VALORLIQUIDO / NULLIF(B.QUANTIDADE, 0))) AS cancelada_dia FROM CM_ORDENSVENDA OVC INNER JOIN CM_OPERACOESFATURAMENTO OFAT ON OFAT.HANDLE = OVC.OPERACAOFATURAMENTO INNER JOIN CM_ORDEMVENDAITENS B ON B.ORDEMVENDA = OVC.HANDLE AND B.STATUS IN (7, 6) WHERE OVC.DATASTATUS >= CAST(GETDATE() AS date) AND OVC.DATASTATUS < DATEADD(DAY, 1, CAST(GETDATE() AS date)) AND OVC.USUARIOINCLUIU <> 24 AND OFAT.K_TIPONATUREZAOPER = 1) AS CANCELADA_DIA"
+  },
+  "whatsapp": {
+    "graph_api_version": "v25.0",
+    "template_name": "resumo_faturamento_diario",
+    "template_language": "pt_BR",
+    "template_parameters": [
+      "data_referencia",
+      "totaldia"
+    ]
+  },
+  "recipients": [],
+  "preview_message": "Olá, sou o *Robô DMB*, confira uma informação importante:\n==> Venda ref. ao Dia *({data_referencia})* : *R$ {totaldia}*.\nConsulta realizada automaticamente no ERP."
+}
